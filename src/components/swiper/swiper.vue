@@ -26,8 +26,10 @@
         default: false
       },
       swiperList: {
-        type: Array,
-        default: []
+        type: Boolean,
+        default () {
+          return []
+        }
       },
       // Default does not play
       autoPlay: {

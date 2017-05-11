@@ -7,13 +7,13 @@ module.exports = {
     // default: http://localhost:8080
     // see nightwatch.conf.js
     const devServer = browser.globals.devServerURL
-
+console.log()
     browser
       .url(devServer)
       .waitForElementVisible('#app', 5000)
-      .assert.elementPresent('.hello')
-      .assert.containsText('h1', 'Welcome to Your Vue.js App')
-      .assert.elementCount('img', 1)
+      .assert.elementPresent('.ws-home')
+      .assert.containsText('header', 'Vue Components')
+      // .assert.elementCount('img', 1)
       .end()
   }
 }
