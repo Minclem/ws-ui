@@ -1,0 +1,42 @@
+//栅格
+.col-xs(@col){
+  -webkit-box-flex: @col;
+  -webkit-flex: @col;
+  flex: @col;
+}
+
+.col-while(@cls, @n, @i: 1) when (@i =< @n) {
+  .@{cls}-@{i} {
+    .col-xs(@i)
+  }
+  .@{cls}-force-@{i} {
+    width: 100% / @n * @i;
+  }
+
+  .col-while(@cls, @n, (@i + 1));
+}
+//左右偏移量
+.col-ofset(@cls, @n, @i: 1) when (@i =< @n) {
+  .@{cls}-ofset-l@{i} {
+    margin-left: 100% / 12 * @i;
+  }
+  .@{cls}-ofset-r@{i} {
+   margin-right: 100% / 12 * @i;
+  }
+  .col-ofset(@cls, @n, (@i + 1));
+}
+
+
+// loading-icon
+.loading-while (@cls, @a, @n, @i: 0) when (@i =< @n) {
+  @c: replace(~"@{a}-0", '0', (@i+1));
+
+  .@{cls}-@{i} {
+    animation: @c 1.25s linear infinite;
+    &:before{
+      transform: rotate(@i*30deg) translate(7.92px, 0px);
+    }
+  }
+
+  .loading-while (@cls, @a, @n, (@i + 1))
+}

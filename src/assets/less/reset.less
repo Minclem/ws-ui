@@ -1,0 +1,148 @@
+@charset "utf-8";
+/* CSS reset */
+html {
+  font-family: @font-family;
+  font-size: @font-size;
+  color: @font-color;
+  background: @background;
+}
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td,
+strong {
+  padding:0;
+  margin:0;
+
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+table {
+  border-collapse:collapse;
+  border-spacing:0;
+}
+fieldset,
+img {
+   border:0;
+}
+a {
+  text-decoration:none;
+  color: inherit;
+  outline:none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+var,
+em,
+strong {
+  font-style:normal;
+}
+hr {
+  border-width: 0 0 1px 0;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var,
+optgroup {
+  font-style:inherit;
+  font-weight:inherit;
+}
+del,
+ins {
+  text-decoration:none;
+}
+li {
+  list-style:none;
+}
+caption {
+  text-align:left;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size:100%;
+  font-weight:normal;
+}
+q:before,
+q:after {
+  content:'';
+}
+abbr,
+acronym {
+  border:0;
+  font-variant:normal;
+}
+legend {
+  color: @font-color;
+}
+input,
+button,
+textarea,
+select,
+optgroup,
+option {
+  font-family:inherit;
+  font-size:inherit;
+  font-style:inherit;
+  font-weight:inherit;
+  outline: none;
+}
+input,
+button,
+textarea,
+select {
+  *font-size:100%;
+}
+.clearfix {
+  *zoom:1;
+}
+.clearfix:after {
+  content:"\200B";
+  display:block;
+  height:0;
+  clear:both;
+}
+/* ios默认样式处理 */
+input[type=reset],
+input[type=submit],
+input[type=button]，
+.btn,
+.button {
+  -webkit-appearance:none;
+  outline:none
+}
+textarea { 
+  -webkit-appearance: none;
+}
