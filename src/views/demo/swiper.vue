@@ -24,10 +24,7 @@
         swiperList: [
           '/static/demo/demo1.jpg',
           '/static/demo/demo2.jpg',
-          '/static/demo/demo3.jpg',
-          '/static/demo/demo4.jpg',
-          '/static/demo/demo5.jpg',
-          '/static/demo/demo6.jpg'
+          '/static/demo/demo3.jpg'
         ]
       }
     }

@@ -1,132 +1,117 @@
 <template>
-  <div class="ws-swiper" :class="'ws-' + direction"
+  <div class="ws-swiper" :class="direction ? 'ws-vertical' : 'ws-level'" 
     @touchstart="touchStart"
-    @touchmove="touchMove"
-    @touchend="touchEnd">
-    <div class="ws-swiper-container">
-      <slot></slot>
+    @touchend="touchEnd"
+    @touchmove="touchMove">
+
+    <div class="ws-swiper-container"
+      :style="{
+            'transform' : 'translate3d(' + translateX + 'px,' + translateY + 'px, 0)',
+            'transition-duration': transitionDuration + 'ms'
+         }">
+        <slot></slot>
     </div>
   </div>
 </template>
 
 <script>
-  import $dom from '@/assets/js/dom.js'
-
   export default {
     name: 'swiper',
     props: {
-      // level or vertical
+      // level === false|vertical === true
       direction: {
-        type: String,
-        default: 'level'
+        type: Boolean,
+        default: false
       },
-      autoPlay: Boolean,
+      // Default does not play
+      autoPlay: {
+        type: Boolean,
+        default: false
+      },
       auto: {
         type: Number,
         default: 3000
-      },
-      setIndex: {
-        type: Number,
-        default: 0
       }
     },
     data () {
       return {
-        rollingDirection: 'pageX',
-        rollingMove: 0,
         currentPage: 0,
         startPos: 0,
-        // startTranslate: 0,
+        pageMove: 0,
         translateX: 0,
         translateY: 0,
-        pageWidth: 0,
-        transitionDuration: 300
+        startTranslate: 0,
+        transitionDuration: 500,
+        timer: null
       }
     },
     mounted () {
-      this.rollingDirection = this.direction === 'level' ? 'pageX' : 'pageY'
-      this.initPage()
+      this.play()
     },
     methods: {
-      initPage () {
-        this.currentPage = this.setIndex
-        this.getDrapObj()
-        this.getWidth()
-      },
       touchStart () {
+        clearInterval(this.timer)
+
+        this.pageMove = 0
         this.transitionDuration = 0
+        this.startTranslate = this.direction ? this.translateY : this.translateX
         this.startPos = this.getThouches()
       },
       touchMove () {
-        this.rollingMove = this.getThouches() - this.startPos
+        this.pageMove = this.getTouchPos(event) - this.startPos
+        this.setTranslate(this.startTranslate + this.pageMove)
+        event.preventDefault()
       },
       touchEnd () {
-        this.transitionDuration = 300
-        if (this.rollingMove > 100) {
-          this.prevPage()
-          return
+        this.transitionDuration = 500
+        this.pageMove = this.getThouches() - this.startPos
+
+        if (this.pageMove > 100) {
+          this.prev()
+        } else if (this.pageMove < -100) {
+          this.next()
+        } else {
+          this.setTranslatePage(this.currentPage)
         }
-        if (this.rollingMove < -100) {
-          this.nextPage()
-          return
-        }
-        this.rollingMove = 0
+
+        this.play()
+      },
+      getTouchPos () {
+        let _direction = this.direction ? 'pageY' : 'pageX'
+
+        return event.changedTouches ? event.changedTouches[0][_direction] : event[_direction]
+      },
+      setTranslate (val) {
+        this.direction ? this.translateY = val : this.translateX = val
+      },
+      setTranslatePage (pageNum) {
+        let size = this.direction ? 'clientHeight' : 'clientWidth'
+        let ev = event ? event.currentTarget : document.querySelector('.ws-swiper')
+        let speed = ev[size] * pageNum
+
+        this.currentPage = pageNum
+        this.setTranslate(-speed)
       },
       getThouches () {
-        return event.changedTouches[0][this.rollingDirection]
+        let pos = this.direction ? 'pageY' : 'pageX'
+        return event.changedTouches[0][pos]
       },
-      setDrapMove (el, speed = 0) {
-        el.style.webkitTransition = this.transitionDuration
-          ? '-webkit-transform ' + this.transitionDuration + 'ms ease-in-out' : ''
-        el.style.webkitTransform = 'translate3d(' + speed + 'px, 0, 0)'
+      prev () {
+        this.currentPage >= 1 ? this.setTranslatePage(this.currentPage - 1) : this.setTranslatePage(this.currentPage)
       },
-      getDrapObj () {
-        let child = this.$children
-        let len = child.length
-
-        if (this.currentPage < 0) this.currentPage = len - 1
-        if (this.currentPage >= len) this.currentPage = 0
-
-        let cur = this.currentPage
-        let prev = cur === 0 ? len - 1 : cur - 1
-        let next = cur === len - 1 ? 0 : cur + 1
-
-        this.drapObj = {
-          cur: child[cur].$el,
-          prev: child[prev].$el,
-          next: child[next].$el
+      next () {
+        this.currentPage < this.$children.length - 1 ? this.setTranslatePage(this.currentPage + 1) : this.setTranslatePage(this.currentPage)
+      },
+      play () {
+        if (this.autoPlay) {
+          let len = this.$children.length
+          this.timer = setInterval(() => {
+            if (len > 1) {
+              if (this.currentPage >= len - 1) this.currentPage = -1
+              this.next()
+            }
+          }, this.auto)
         }
-
-        $dom('.ws-swiper-item').removeClass('is-show-page is-prev-page is-next-page')
-        $dom(child[cur].$el).addClass('is-show-page')
-        $dom(child[prev].$el).addClass('is-prev-page')
-        $dom(child[next].$el).addClass('is-next-page')
-      },
-      prevPage () {
-        this.rollingMove = this.pageWidth
-        setTimeout(() => {
-          this.currentPage--
-        }, this.transitionDuration)
-      },
-      nextPage () {
-        this.rollingMove = -this.pageWidth
-        setTimeout(() => {
-          this.currentPage++
-        }, this.transitionDuration)
-      },
-      getWidth () {
-        this.pageWidth = this.drapObj.cur.clientWidth
-      }
-    },
-    watch: {
-      currentPage (val) {
-        this.getDrapObj()
-        this.$emit('change', val)
-      },
-      rollingMove (val) {
-        this.setDrapMove($dom('.is-show-page')[0], val)
-        this.setDrapMove($dom('.is-prev-page')[0], -this.pageWidth + val)
-        this.setDrapMove($dom('.is-next-page')[0], this.pageWidth + val)
       }
     }
   }
@@ -143,31 +128,30 @@
     }
 
     .ws-swiper-container {
-      position: relative;
       width: 100%;
       height: 100%;
     }
   }
-  .ws-swiper-item {
-    display: none;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  .ws-swiper-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
 
-    &.is-show-page,
-    &.is-prev-page,
-    &.is-next-page {
-      display: block;
-    }
-    &.is-show-page {
-      z-index: 9;
-    }
-    img {
-      display: block;
+    .ws-swiper-item {
+      overflow: hidden;
       width: 100%;
+      height: 100%;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+      display: -webkit-flex;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        display: block;
+        width: 100%;
+      }
     }
   }
 </style>
