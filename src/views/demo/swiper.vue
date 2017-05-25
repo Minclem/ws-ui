@@ -13,11 +13,15 @@
 <script>
   import Swiper from '@/components/swiper/swiper'
   import SwiperItem from '@/components/swiper/swiper-item'
+  import $ from '@/assets/js/dom.js'
 
   export default {
     components: {
       Swiper,
       SwiperItem
+    },
+    mounted () {
+      console.log($)
     },
     data () {
       return {
