@@ -201,6 +201,8 @@ class DOM {
       }
     }
     return this.each(function () {
+      // The last semicolon in IE will be deleted
+      // At the same time, prevent the original style from being deleted
       this.style.cssText += ';' + css
     })
   }
