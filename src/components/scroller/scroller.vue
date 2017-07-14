@@ -84,11 +84,8 @@
           this.translateY = Y;
           this.upStatus = 1;
 
-          // 加载操作
-          if(Y < -40) {
-            this.upStatus = 2;
-            this.load();
-          }
+          // 加载操作提示
+          if (Y < -40) this.upStatus = 2;
         }
       },
       touchend: function (e) {
@@ -100,10 +97,25 @@
           // 刷新时进行停顿
           this.translateY = 40;
           this.refresh();
-        } else {
+        } else if (this.translateY < -40) {
+          this.upStatus = 3;
+          this.translateY = 0;
+          this.load();
+        } else  {
           this.translateY = 0
         }
+      },
+      // 更新加载完后 需要调用此方法
+      refreshStatus: function (ty) {
+        if (ty === 'load') this.upStatus = 4;
+        if (ty === 'refresh') this.dowmStatus = 3;
 
+        // 状态还原
+        setTimeout(()=> {
+          this.upStatus = 0;
+          this.dowmStatus = 0;
+          this.translateY = 0;
+        }, 300)
       },
       scroll: function () {
         /**
@@ -120,22 +132,11 @@
       load: function () {
         // 模拟加载
         this.upStatus = 3;
-        this.timer = setTimeout(()=>{
-          this.upStatus = 4;
-        }, 1000)
-        this.timer = setTimeout(()=>{
-          this.translateY = 0;
-          this.upStatus = 0;
-        }, 1500)
+        this.$emit('load', this);
       },
       refresh: function () {
         // 模拟刷新
-        this.timer = setTimeout(()=>{
-          this.dowmStatus = 3;
-        }, 1000)
-        this.timer = setTimeout(()=>{
-          this.translateY = 0
-        }, 1500)
+        this.$emit('refresh', this);
       },
       getMaxScroll: function () {
         // 获取最大的滚动范围
@@ -150,28 +151,24 @@
 </script>
 
 
-<style scoped>
+<style lang="less">
   .scroller {
     position: relative;
     overflow-y: auto;
     width: 100%;
-    height: 100%;
+    height: 528px;
     background: #f5f8f9;
-  }
-  .scroller li {
-    line-height: 40px;
-    padding: 0 20px;
-    border-bottom: 1px dashed #aaa;
-  }
-  .pull {
-    width: 100%;
-    line-height: 40px;
-    text-align: center;
-    color: #c0cad0;
-  }
-  .pull-dowm {
-    position: absolute;
-    top: -40px;
-    left: 0;
+    
+    .pull {
+      width: 100%;
+      line-height: 40px;
+      text-align: center;
+      color: #c0cad0;
+    }
+    .pull-dowm {
+      position: absolute;
+      top: -40px;
+      left: 0;
+    }
   }
 </style>
